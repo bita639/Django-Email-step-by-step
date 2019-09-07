@@ -1,0 +1,146 @@
+((Note: >> mean its a command or code line ))
+
+>> django-admin startproject Email
+
+>>cd Email
+
+>>python manage.py startapp emailApp
+
+Create afolder templates into emailApp, templates folder contains all html files
+
+now open the project folder with atom
+
+Add 'emailApp', in setting file inside INSTALLED_APPS List
+
+Now create a email.html file inside templates folder 
+
+and write "Hello!! " inside the html file.
+
+import some library into view.py file.
+
+from django.core.mail import BadHeaderError,EmailMessage
+from django.http import HttpResponse
+
+Now we have to create a function inside views.py file.
+
+def email(request):
+    
+    return render(request,'email.html')
+
+now go to urls.py file and import views from emailApp
+
+>> from emailApp import views
+
+Now declare path into same file urls.py
+
+>> path('mail',views.email,name='mail'),
+
+Save every file changes and then go to cmd from project file, you can type cmd in the folder address bar. then type
+
+>> manage.py runserver
+
+hope you will not get any error, but if you get any error please read the error and try to understand and make 
+required changes for solving error. 
+
+now visit http://127.0.0.1:8000/mail ,booom!!  u will see hello!!  thats means you are almost done.  we
+ used 'mail' because we have declared "mail" in urls.py file.
+
+now create a forms.py inside the emaillApp folder.  and then import forms from django library.
+>> from django import forms
+
+then define a contactForm class. which will contains all fields and their attributes.
+
+class ContactForm(forms.Form):
+        to =forms.EmailField(required=True, widget = forms.TextInput(attrs={'class':'form-control col-sm-4','placeholder':'Email Address'}))
+        subject =forms.CharField(required=True, widget = forms.TextInput(attrs={'class':'form-control col-sm-4', 'placeholder':'subject'}))
+        message =forms.CharField(required=True, widget = forms.Textarea(attrs={'class':'form-control col-sm-4','placeholder':'Message'}),label=(''))
+
+now go back to views.py file and clear previously crerated "email" function fully, and past the given code.dont delete imported library keep it mind.
+
+def email(request):
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+
+            subject = form.cleaned_data['subject']
+
+            from_email = form.cleaned_data['to']
+
+            message = form.cleaned_data['message']
+
+            recipient_list = []
+            recipient_list.append(from_email)
+            try:
+                emailobj = EmailMessage(subject,message,to=recipient_list)
+                emailobj.send()
+                return HttpResponse("BooM!!! Your Email Has been sent!!!!!!!")
+            except BadHeaderError:
+                return HttpResponse('Invalid Header Found.')
+            #return redirect('/') #note: if you want to redirect it to anywhere else please declare the path
+    return render(request,'email.html',{'form':form})
+
+add a library into views.py file.
+
+>> from emailApp.forms import ContactForm
+
+
+Your have done 97%, well done!!! :) 
+
+now go to email.html file. copy and past the below code inside the file.
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+   <title>Email</title>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body>
+      <div class="container">
+        <h1>Contact US</h1>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group row">
+              {{field.errors}}
+              <label class="col-sm-2 col-form-label" for="{{field.name}}">{{field.label_tag}}</label>
+              {{field}}
+              {% if field.help_text %}
+              <p class="help">{{ field.help_text|safe}}</p>
+              {%endif%}
+            </div>
+          {% endfor %}
+          <div class="form-actions">
+            <button type="submit" >send</button>
+          </div>
+        </form>
+      </div>
+      </body>
+
+Go to setings.py file and copy and past the below code at the bottom of the file.
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'Your_EMail_adress'
+EMAIL_HOST_PASSWORD = 'Your_email_password'
+
+now go to to http://127.0.0.1:8000/mail and send mail happily, 
+
+Note: some google account security settings might be high in person to person, if you get any password or authentication error
+please visit this link, and turn on less secure app access. 
+
+>> https://myaccount.google.com/lesssecureapps?pli=1
+
+Happy coding.
+
+
+
+
+
+
+
+
