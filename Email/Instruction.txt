@@ -8,7 +8,7 @@
 
 Create afolder templates into emailApp, templates folder contains all html files
 
-now open the project folder with atom
+now open the project folder with atom or any other editor
 
 Add 'emailApp', in setting file inside INSTALLED_APPS List
 
